@@ -26,10 +26,8 @@ export default function TaskList({
     >
       {(provided, snapshot) => (
         <div
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          className={`bg-gray-100 p-4 rounded shadow min-w-[250px] transition-colors ${
-            snapshot.isDraggingOver ? "bg-blue-100" : ""
+          className={`p-4 rounded shadow min-w-[250px] min-h-[150px] transition-colors ${
+            snapshot.isDraggingOver ? "bg-blue-50" : "bg-gray-100"
           }`}
         >
           <h3
@@ -38,7 +36,7 @@ export default function TaskList({
           >
             {status}
           </h3>
-          <div>
+          <div ref={provided.innerRef} {...provided.droppableProps}>
             {filteredTasks.map((task, index) => (
               <TaskCard key={task.id} index={index} task={task} />
             ))}
