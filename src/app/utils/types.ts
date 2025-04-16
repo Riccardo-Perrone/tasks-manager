@@ -8,6 +8,6 @@ export type Tasks = {
   id: string;
   title: string;
   status: TaskStatus;
-  timeEstimated: string;
+  timeEstimated: number;
   description: string;
 };

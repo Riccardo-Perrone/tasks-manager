@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import TaskList from "../components/taskList";
+import TaskList from "../components/TaskList";
 import { Tasks, TaskStatus } from "../utils/types";
 import {
   DragDropContext,
@@ -8,27 +8,28 @@ import {
   Droppable,
   Draggable,
 } from "@hello-pangea/dnd";
+import TaskFormModal from "../components/TaskFormModal";
 
 const tasksMockToDo: Tasks[] = [
   {
     id: "task-1",
     title: "Titolo 1",
     status: TaskStatus.ToDo,
-    timeEstimated: "01/01/1990",
+    timeEstimated: 3,
     description: "Descrizione",
   },
   {
     id: "task-4",
     title: "Titolo 4",
     status: TaskStatus.ToDo,
-    timeEstimated: "01/01/1990",
+    timeEstimated: 3,
     description: "Descrizione",
   },
   {
     id: "task-5",
     title: "Titolo 5",
     status: TaskStatus.ToDo,
-    timeEstimated: "01/01/1990",
+    timeEstimated: 3,
     description: "Descrizione",
   },
 ];
@@ -37,7 +38,7 @@ const tasksMockProgress: Tasks[] = [
     id: "task-2",
     title: "Titolo 2",
     status: TaskStatus.InProgress,
-    timeEstimated: "01/01/1990",
+    timeEstimated: 2,
     description: "Descrizione",
   },
 ];
@@ -46,7 +47,7 @@ const tasksMockDone: Tasks[] = [
     id: "task-3",
     title: "Titolo 3",
     status: TaskStatus.Done,
-    timeEstimated: "01/01/1990",
+    timeEstimated: 2,
     description: "Descrizione",
   },
 ];
@@ -67,6 +68,7 @@ export default function DashboardClient() {
     [TaskStatus.InProgress]: tasksMockProgress,
     [TaskStatus.Done]: tasksMockDone,
   });
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     // Esegui la richiesta GET per ottenere i task
@@ -124,8 +126,21 @@ export default function DashboardClient() {
   };
 
   return (
-    <div>
-      <button>Nuova Task</button>
+    <div className="overflow-auto h-screen">
+      <button
+        onClick={() => setOpen(true)}
+        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+      >
+        Nuova Task
+      </button>
+
+      <TaskFormModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={() => {
+          //
+        }}
+      />
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable
           droppableId="all-columns"
@@ -149,7 +164,7 @@ export default function DashboardClient() {
                       <TaskList
                         status={status}
                         tasks={tasksByStatus[status]}
-                        dragHandleProps={provided.dragHandleProps}
+                        dragHandleProps={provided.dragHandleProps!}
                       />
                     </div>
                   )}

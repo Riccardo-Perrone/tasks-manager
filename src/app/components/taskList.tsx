@@ -1,6 +1,6 @@
 import React from "react";
 import { Tasks, TaskStatus } from "../utils/types";
-import TaskCard from "./taskCard";
+import TaskCard from "./TaskCard";
 import { Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 
 interface TaskListProps {

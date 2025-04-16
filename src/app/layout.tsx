@@ -1,3 +1,5 @@
+"use client";
+import Sidebar from "./components/Sidebar";
 import "./globals.css";
 
 export default function RootLayout({
@@ -7,7 +9,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`m-5`}>{children}</body>
+      <body className="bg-gray-100 flex flex-row max-lg:flex-col min-h-screen">
+        <Sidebar />
+        {/* Main content */}
+        <main className="m-4">{children}</main>
+      </body>
     </html>
   );
 }
