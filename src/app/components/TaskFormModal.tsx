@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Tasks, TaskStatus } from "../utils/types";
+import { Task, TaskStatus } from "../utils/types";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (task: Tasks) => void;
+  onSubmit: (task: Task) => void;
 };
 
 function TaskFormModal({ open, onClose, onSubmit }: Props) {
-  const [form, setForm] = useState<Omit<Tasks, "id">>({
+  const [form, setForm] = useState<Omit<Task, "id">>({
     title: "",
     status: TaskStatus.ToDo,
     timeEstimated: 0,
@@ -31,7 +31,7 @@ function TaskFormModal({ open, onClose, onSubmit }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newTask: Tasks = {
+    const newTask: Task = {
       id: crypto.randomUUID(),
       ...form,
     };

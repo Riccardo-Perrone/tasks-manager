@@ -1,24 +1,40 @@
 import React from "react";
-import { Tasks } from "../utils/types";
+import { Task } from "../utils/types";
 import { Draggable } from "@hello-pangea/dnd";
+//icons
+import { AiOutlineClockCircle } from "react-icons/ai";
+import { FaRegEdit } from "react-icons/fa";
 
 interface Props {
-  task: Tasks;
+  task: Task;
   index: number;
+  handleClick: (task: Task) => void;
 }
 
-function TaskCard({ task, index }: Props) {
+function TaskCard({ task, index, handleClick }: Props) {
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
         <div
-          className="p-3 mb-3 rounded shadow bg-white"
+          className="p-3 mb-3 rounded shadow bg-white cursor-pointer relative group"
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <div className="font-semibold">{task.title}</div>
-          <p className="text-sm">{task.description}</p>
+          <div
+            className="absolute top-2 right-2 text-gray-500 cursor-pointer rounded-3xl p-1 flex justify-center items-center hover:bg-blue-50 hover:text-gray-700  opacity-0 group-hover:opacity-100"
+            onClick={() => handleClick(task)}
+          >
+            <FaRegEdit />
+          </div>
+
+          <div className="flex justify-between">
+            <span className="font-semibold">{task.title}</span>
+          </div>
+          <div className="bg-blue-100 w-fit rounded-md px-2 flex flex-row items-center gap-1.5">
+            {`${task.timeEstimated}`}
+            <AiOutlineClockCircle />
+          </div>
         </div>
       )}
     </Draggable>

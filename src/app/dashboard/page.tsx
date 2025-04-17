@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import TaskList from "../components/TaskList";
-import { Tasks, TaskStatus } from "../utils/types";
+import { Task, TaskStatus } from "../utils/types";
 import {
   DragDropContext,
   DropResult,
@@ -10,7 +10,7 @@ import {
 } from "@hello-pangea/dnd";
 import TaskFormModal from "../components/TaskFormModal";
 
-const tasksMockToDo: Tasks[] = [
+const tasksMockToDo: Task[] = [
   {
     id: "task-1",
     title: "Titolo 1",
@@ -33,7 +33,7 @@ const tasksMockToDo: Tasks[] = [
     description: "Descrizione",
   },
 ];
-const tasksMockProgress: Tasks[] = [
+const tasksMockProgress: Task[] = [
   {
     id: "task-2",
     title: "Titolo 2",
@@ -42,7 +42,7 @@ const tasksMockProgress: Tasks[] = [
     description: "Descrizione",
   },
 ];
-const tasksMockDone: Tasks[] = [
+const tasksMockDone: Task[] = [
   {
     id: "task-3",
     title: "Titolo 3",
@@ -53,7 +53,7 @@ const tasksMockDone: Tasks[] = [
 ];
 
 type TaskColumns = {
-  [key: string]: Tasks[];
+  [key: string]: Task[];
 };
 
 export default function DashboardClient() {
