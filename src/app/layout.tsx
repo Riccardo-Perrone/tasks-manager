@@ -11,7 +11,7 @@ export default function RootLayout({
       <body className="bg-gray-100 flex flex-row max-lg:flex-col min-h-screen">
         <Sidebar />
         {/* Main content */}
-        <main className="m-4">{children}</main>
+        <main className="m-4 flex-1">{children}</main>
       </body>
     </html>
   );

@@ -135,7 +135,7 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="overflow-auto h-screen">
+    <div className="overflow-auto h-screen w-full">
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable
           droppableId="all-columns"

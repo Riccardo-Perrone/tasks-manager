@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 import { Task, TaskStatus } from "../utils/types";
 import { MdDelete } from "react-icons/md";
 import { statusToLabel } from "../utils/statusToLabel";
+import InputCustom from "./InputCustom";
+import Editor, {
+  BtnBold,
+  BtnItalic,
+  ContentEditableEvent,
+  Toolbar,
+  BtnBulletList,
+  BtnLink,
+  BtnNumberedList,
+  BtnStrikeThrough,
+  BtnUnderline,
+  BtnStyles,
+} from "react-simple-wysiwyg";
 
 type TaskId = {
   id: string;
@@ -20,7 +33,6 @@ interface Props {
 
 export const taskDefault: Task = {
   title: "",
-  time_estimated: 1,
   description: "",
   order_task: 0,
 };
@@ -29,6 +41,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
   const [form, setForm] = useState<Task>(taskDefault);
   const [taskList, setTaskList] = useState<TaskId[]>([]);
   const [taskListIdState, setTaskListIdState] = useState<string>(taskListId);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   useEffect(() => {
     if (!!taskDetails) {
@@ -58,11 +71,14 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e:
+      | React.ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+      | ContentEditableEvent
   ) => {
     const { name, value } = e.target;
+    if (!name || !value) return;
     setForm((prev) => ({
       ...prev,
       [name]: name === "time_estimated" ? Number(value) : value,
@@ -166,6 +182,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
       } else {
         const deletedTask = await response.json();
         console.log("Task eliminata con successo:", deletedTask);
+        setConfirmDelete(false);
         onSubmit();
       }
     } catch (error) {
@@ -175,64 +192,78 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-10">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative m-2">
-        <h2 className="text-xl font-bold mb-4">
+      <div className="bg-gray-200 p-6 rounded-lg w-full max-w-md shadow-lg relative m-2">
+        <h2 className="text-2xl font-bold mb-4">
           {form.id ? "Modifica della task" : "Crea una nuova task"}
         </h2>
 
         {!!taskDetails?.id && (
-          <div
-            className="absolute top-5 right-5 text-gray-500 cursor-pointer rounded-3xl p-1 flex justify-center items-center hover:bg-red-50 hover:text-red-700"
-            onClick={() => deleteTask(form.id!)}
-          >
-            <MdDelete />
-          </div>
+          <>
+            {confirmDelete ? (
+              <div
+                className="absolute top-5 right-5 "
+                onClick={() => deleteTask(form.id!)}
+                onPointerOut={() => {
+                  setTimeout(() => {
+                    setConfirmDelete(false);
+                  }, 300);
+                }}
+              >
+                <button
+                  type="submit"
+                  className="opacity-0 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 cursor-pointer transition-opacity duration-300 hover:opacity-100"
+                >
+                  Elimina
+                </button>
+              </div>
+            ) : (
+              <div
+                className="text-2xl absolute top-5 right-5 text-gray-500 cursor-pointer rounded-3xl p-1 flex justify-center items-center hover:bg-red-50 hover:text-red-700"
+                onClick={() => setConfirmDelete(true)}
+              >
+                <MdDelete className="transform transition-transform duration-300 hover:scale-110" />
+              </div>
+            )}
+          </>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Titolo
-            </label>
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              required
-              maxLength={50}
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <InputCustom
+            label="Titolo *"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            required
+            maxLength={50}
+          />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Descrizione
-            </label>
-            <textarea
+            <Editor
+              value={form.description || ""}
+              onChange={handleChange}
               name="description"
-              value={form.description}
-              onChange={handleChange}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = "auto";
-                const maxHeight = 200;
-                const newHeight = Math.min(target.scrollHeight, maxHeight);
-                target.style.height = `${newHeight}px`;
-              }}
-              maxLength={500}
-              rows={3}
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden"
-            />
+              className="max-h-50 overflow-auto bg-white"
+            >
+              <Toolbar>
+                <BtnBold />
+                <BtnItalic />
+                <BtnUnderline />
+                <BtnStrikeThrough />
+                <div className="rsw-separator"></div>
+                <BtnNumberedList />
+                <BtnBulletList />
+              </Toolbar>
+            </Editor>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Stato
             </label>
             <select
               name="status"
               value={taskListIdState}
               onChange={(e) => setTaskListIdState(e.target.value)}
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 w-full border bg-white border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-500"
             >
               {taskList.map((status) => (
                 <option key={status.id} value={status.id}>
@@ -242,31 +273,26 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Tempo stimato (ore)
-            </label>
-            <input
-              name="time_estimated"
-              type="number"
-              value={form.time_estimated}
-              onChange={handleChange}
-              min={1}
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <InputCustom
+            label="Tempo stimato (ore)"
+            name="time_estimated"
+            type="number"
+            value={form.time_estimated || undefined}
+            onChange={handleChange}
+            min={0}
+          />
 
           <div className="flex justify-end space-x-2 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
             >
               Annulla
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 bg-neutral-700 text-white rounded-md hover:bg-neutral-500 cursor-pointer"
             >
               Salva
             </button>

@@ -71,7 +71,6 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   const { title, description, time_estimated, status,task_list_id } = req.body;
   if (!title) return res.status(400).json({ error: 'title is required' });
-  if (!time_estimated) return res.status(400).json({ error: 'time_estimated is required' });
   if (!task_list_id) return res.status(400).json({ error: 'task_list_id is required' });
   try {
     const orderQuery = await db.query(
@@ -102,7 +101,6 @@ router.put('/:id', async (req, res) => {
 
   // Validazioni
   if (!title) return res.status(400).json({ error: 'title is required' });
-  if (!time_estimated) return res.status(400).json({ error: 'time_estimated is required' });
   if (!task_list_id) return res.status(400).json({ error: 'task_list_id is required' });
 
   try {

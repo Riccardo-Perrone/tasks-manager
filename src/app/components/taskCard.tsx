@@ -29,10 +29,12 @@ function TaskCard({ task, index, handleClick }: Props) {
           <div className="flex justify-between">
             <span className="font-semibold">{task.title}</span>
           </div>
-          <div className="bg-blue-100 w-fit rounded-md px-2 flex flex-row items-center gap-1.5">
-            {`${task.time_estimated}`}
-            <AiOutlineClockCircle />
-          </div>
+          {task.time_estimated && (
+            <div className="bg-blue-100 w-fit rounded-md px-2 flex flex-row items-center gap-1.5">
+              {`${task.time_estimated}`}
+              <AiOutlineClockCircle />
+            </div>
+          )}
         </div>
       )}
     </Draggable>

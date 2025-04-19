@@ -14,18 +14,17 @@ function Sidebar() {
 
   return (
     <>
-      {/* Mobile sidebar */}
       <div
-        className={`fixed z-5 top-0 left-0 max-lg:h-full bg-white border-r transition-all duration-300
+        className={`fixed z-5 top-0 left-0 max-lg:h-full bg-gray-200 transition-all duration-300
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
             lg:relative lg:translate-x-0 ${
               sidebarCollapsed ? "lg:w-16" : "lg:w-40"
             }`}
       >
-        <div className="flex items-center justify-between px-2.5 py-3 border-b">
+        <div className="flex items-center justify-between px-2.5 py-3 border-b ">
           <a href="/">
             <span className="font-bold text-lg truncate">
-              {sidebarCollapsed ? <IoMdHome /> : "Home"}
+              {sidebarCollapsed ? <IoMdHome /> : "!Jira"}
             </span>
           </a>
           <div className="flex gap-2">
@@ -53,7 +52,7 @@ function Sidebar() {
         <nav className="mt-4 space-y-2 px-2">
           <a
             href="/dashboard"
-            className="block px-3 py-2 rounded-md hover:bg-gray-200 text-sm"
+            className="block px-3 py-2 rounded-md hover:bg-white text-sm"
           >
             {sidebarCollapsed ? <FaTasks /> : "Dashboard"}
           </a>

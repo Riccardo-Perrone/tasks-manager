@@ -23,7 +23,7 @@ CREATE TABLE tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
-  time_estimated INTEGER NOT NULL,
+  time_estimated INTEGER,
   order_task INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   task_list_id UUID REFERENCES tasks_list(id) ON DELETE CASCADE
