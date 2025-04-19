@@ -18,7 +18,7 @@ export default function DashboardClient() {
 
   const getData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/tasks");
+      const res = await fetch("/api/tasks", { method: "GET" });
       if (!res.ok) throw new Error("Errore nella richiesta");
 
       const data: TaskListType[] = await res.json();
@@ -31,8 +31,6 @@ export default function DashboardClient() {
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, type, combine, draggableId } = result;
-
-    console.log(result);
 
     if (!destination) return;
 
@@ -96,17 +94,14 @@ export default function DashboardClient() {
 
   const moveTask = async (newTask: Task) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/tasks/move-task/${newTask.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            task_list_id: newTask.task_list_id,
-            order_task: newTask.order_task,
-          }),
-        }
-      );
+      const response = await fetch(`/api/tasks/move-task/${newTask.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          task_list_id: newTask.task_list_id,
+          order_task: newTask.order_task,
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -123,7 +118,7 @@ export default function DashboardClient() {
 
   const updateOrderList = async (task_list_id: string, order: number) => {
     const response = await fetch(
-      `http://localhost:8080/api/tasks-list/change-order/${task_list_id}`,
+      `/api/tasks-list/change-order/${task_list_id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

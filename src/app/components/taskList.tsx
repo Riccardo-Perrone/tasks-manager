@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Task, TaskListType, TaskStatus } from "../utils/types";
 import TaskCard from "./TaskCard";
 import { Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
@@ -19,6 +19,10 @@ export default function TaskList({
   getData,
 }: Props) {
   const [valueTask, setValueTask] = useState<Task>();
+
+  useEffect(() => {
+    console.log(valueTask);
+  }, [valueTask]);
 
   return (
     <>

@@ -11,11 +11,9 @@ import Editor, {
   ContentEditableEvent,
   Toolbar,
   BtnBulletList,
-  BtnLink,
   BtnNumberedList,
   BtnStrikeThrough,
   BtnUnderline,
-  BtnStyles,
 } from "react-simple-wysiwyg";
 
 type TaskId = {
@@ -45,21 +43,18 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
 
   useEffect(() => {
     if (!!taskDetails) {
-      if (!!taskDetails.id) {
+      if (!!taskDetails.id && taskDetails.id !== form.id) {
         getSingleTask(taskDetails.id);
       } else {
         setForm(taskDetails);
       }
     }
-  }, [taskDetails]);
-
-  useEffect(() => {
     getStatusData();
   }, []);
 
   const getStatusData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/tasks-List");
+      const res = await fetch("/api/tasks-list");
       if (!res.ok) throw new Error("Errore nella richiesta");
 
       const data: TaskId[] = await res.json();
@@ -99,7 +94,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
 
   const getSingleTask = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+      const response = await fetch(`/api/tasks/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -121,7 +116,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
 
   const createNewTask = async (newTask: Task) => {
     try {
-      const response = await fetch("http://localhost:8080/api/tasks", {
+      const response = await fetch("/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,16 +138,13 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
   };
   const updateTask = async (newTask: Task) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/tasks/${newTask.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...newTask, task_list_id: taskListIdState }),
-        }
-      );
+      const response = await fetch(`/api/tasks/${newTask.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...newTask, task_list_id: taskListIdState }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -169,7 +161,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
 
   const deleteTask = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+      const response = await fetch(`/api/tasks/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
