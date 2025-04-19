@@ -1,21 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Task, TaskStatus } from "../utils/types";
+import { MdDelete } from "react-icons/md";
+import { statusToLabel } from "../utils/statusToLabel";
 
-type Props = {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (task: Task) => void;
+type TaskId = {
+  id: string;
+  status: TaskStatus;
+  order_list: number;
 };
 
-function TaskFormModal({ open, onClose, onSubmit }: Props) {
-  const [form, setForm] = useState<Omit<Task, "id">>({
-    title: "",
-    status: TaskStatus.ToDo,
-    timeEstimated: 0,
-    description: "",
-  });
+interface Props {
+  taskDetails?: Task;
+  onSubmit: () => void;
+  onClose: () => void;
+  taskListId: string;
+}
+
+export const taskDefault: Task = {
+  title: "",
+  time_estimated: 1,
+  description: "",
+  order_task: 0,
+};
+
+function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
+  const [form, setForm] = useState<Task>(taskDefault);
+  const [taskList, setTaskList] = useState<TaskId[]>([]);
+  const [taskListIdState, setTaskListIdState] = useState<string>(taskListId);
+
+  useEffect(() => {
+    if (!!taskDetails) {
+      if (!!taskDetails.id) {
+        getSingleTask(taskDetails.id);
+      } else {
+        setForm(taskDetails);
+      }
+    }
+  }, [taskDetails]);
+
+  useEffect(() => {
+    getStatusData();
+  }, []);
+
+  const getStatusData = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/tasks-List");
+      if (!res.ok) throw new Error("Errore nella richiesta");
+
+      const data: TaskId[] = await res.json();
+      const sorted = data.sort((a, b) => a.order_list - b.order_list);
+      setTaskList(sorted);
+    } catch (err) {
+      console.error("Errore durante il fetch:", err);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -25,26 +65,129 @@ function TaskFormModal({ open, onClose, onSubmit }: Props) {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === "timeEstimated" ? Number(value) : value,
+      [name]: name === "time_estimated" ? Number(value) : value,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTask: Task = {
-      id: crypto.randomUUID(),
       ...form,
     };
-    onSubmit(newTask);
-    onClose();
+    if (newTask.id !== undefined) {
+      updateTask(newTask);
+    } else {
+      createNewTask(newTask);
+    }
   };
 
-  if (!open) return null;
+  const getSingleTask = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Errore:", errorData.error);
+      } else {
+        const singleTask = await response.json();
+        console.log("Task trovata con successo:", singleTask);
+        setForm(singleTask);
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+    }
+  };
+
+  const createNewTask = async (newTask: Task) => {
+    try {
+      const response = await fetch("http://localhost:8080/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...newTask, task_list_id: taskListIdState }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Errore:", errorData.error);
+      } else {
+        const createdTask = await response.json();
+        console.log("Task creata con successo:", createdTask);
+        onSubmit();
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+    }
+  };
+  const updateTask = async (newTask: Task) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/tasks/${newTask.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...newTask, task_list_id: taskListIdState }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Errore:", errorData.error);
+      } else {
+        const updatedTask = await response.json();
+        console.log("Task modificata con successo:", updatedTask);
+        onSubmit();
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Errore:", errorData.error);
+      } else {
+        const deletedTask = await response.json();
+        console.log("Task eliminata con successo:", deletedTask);
+        onSubmit();
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-10">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-        <h2 className="text-xl font-bold mb-4">Crea una nuova task</h2>
+      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative m-2">
+        <h2 className="text-xl font-bold mb-4">
+          {form.id ? "Modifica della task" : "Crea una nuova task"}
+        </h2>
+
+        {!!taskDetails?.id && (
+          <div
+            className="absolute top-5 right-5 text-gray-500 cursor-pointer rounded-3xl p-1 flex justify-center items-center hover:bg-red-50 hover:text-red-700"
+            onClick={() => deleteTask(form.id!)}
+          >
+            <MdDelete />
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -55,6 +198,7 @@ function TaskFormModal({ open, onClose, onSubmit }: Props) {
               value={form.title}
               onChange={handleChange}
               required
+              maxLength={50}
               className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -67,7 +211,16 @@ function TaskFormModal({ open, onClose, onSubmit }: Props) {
               name="description"
               value={form.description}
               onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = "auto";
+                const maxHeight = 200;
+                const newHeight = Math.min(target.scrollHeight, maxHeight);
+                target.style.height = `${newHeight}px`;
+              }}
+              maxLength={500}
+              rows={3}
+              className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden"
             />
           </div>
 
@@ -77,13 +230,13 @@ function TaskFormModal({ open, onClose, onSubmit }: Props) {
             </label>
             <select
               name="status"
-              value={form.status}
-              onChange={handleChange}
+              value={taskListIdState}
+              onChange={(e) => setTaskListIdState(e.target.value)}
               className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {Object.values(TaskStatus).map((status) => (
-                <option key={status} value={status}>
-                  {status}
+              {taskList.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {statusToLabel(status.status)}
                 </option>
               ))}
             </select>
@@ -91,14 +244,14 @@ function TaskFormModal({ open, onClose, onSubmit }: Props) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Tempo stimato (min)
+              Tempo stimato (ore)
             </label>
             <input
-              name="timeEstimated"
+              name="time_estimated"
               type="number"
-              value={form.timeEstimated}
+              value={form.time_estimated}
               onChange={handleChange}
-              min={0}
+              min={1}
               className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

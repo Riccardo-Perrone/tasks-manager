@@ -1,3 +1,10 @@
+export type TaskListType = {
+  task_list_id: string;
+  order_list: number;
+  status: TaskStatus;
+  tasks: Task[];
+};
+
 export enum TaskStatus {
   ToDo = "to-do",
   InProgress = "in-progress",
@@ -5,9 +12,10 @@ export enum TaskStatus {
 }
 
 export type Task = {
-  id: string;
+  id?: string;
+  order_task: number;
   title: string;
-  status: TaskStatus;
-  timeEstimated: number;
-  description: string;
+  time_estimated: number;
+  description?: string;
+  task_list_id?: string;
 };

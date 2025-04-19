@@ -1,10 +1,20 @@
+"use client";
 import React, { useState } from "react";
+//icons
+import { FaTasks } from "react-icons/fa";
+import {
+  IoIosArrowDropleftCircle,
+  IoIosArrowDroprightCircle,
+} from "react-icons/io";
+import { IoMdHome } from "react-icons/io";
 
 function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   return (
     <>
+      {/* Mobile sidebar */}
       <div
         className={`fixed z-5 top-0 left-0 max-lg:h-full bg-white border-r transition-all duration-300
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -12,10 +22,10 @@ function Sidebar() {
               sidebarCollapsed ? "lg:w-16" : "lg:w-40"
             }`}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+        <div className="flex items-center justify-between px-2.5 py-3 border-b">
           <a href="/">
             <span className="font-bold text-lg truncate">
-              {sidebarCollapsed ? "H" : "Home"}
+              {sidebarCollapsed ? <IoMdHome /> : "Home"}
             </span>
           </a>
           <div className="flex gap-2">
@@ -24,7 +34,11 @@ function Sidebar() {
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className="hidden lg:inline text-gray-500 hover:text-black"
             >
-              {sidebarCollapsed ? "→" : "←"}
+              {sidebarCollapsed ? (
+                <IoIosArrowDroprightCircle />
+              ) : (
+                <IoIosArrowDropleftCircle />
+              )}
             </button>
             {/* Close button (mobile only) */}
             <button
@@ -41,7 +55,7 @@ function Sidebar() {
             href="/dashboard"
             className="block px-3 py-2 rounded-md hover:bg-gray-200 text-sm"
           >
-            {sidebarCollapsed ? "📋" : "Dashboard"}
+            {sidebarCollapsed ? <FaTasks /> : "Dashboard"}
           </a>
         </nav>
       </div>

@@ -1,49 +1,85 @@
-import React from "react";
-import { Tasks, TaskStatus } from "../utils/types";
+import React, { useState } from "react";
+import { Task, TaskListType, TaskStatus } from "../utils/types";
 import TaskCard from "./TaskCard";
 import { Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
+//icons
+import { FiPlus } from "react-icons/fi";
+import TaskFormModal, { taskDefault } from "./TaskFormModal";
+import { statusToLabel } from "../utils/statusToLabel";
 
-interface TaskListProps {
-  status: TaskStatus;
-  tasks: Tasks[];
+interface Props {
+  taskList: TaskListType;
   dragHandleProps?: DraggableProvidedDragHandleProps;
+  getData: () => void;
 }
 
 export default function TaskList({
-  status,
-  tasks,
   dragHandleProps,
-}: TaskListProps) {
-  const filteredTasks = tasks.filter((task) => task.status === status);
+  taskList,
+  getData,
+}: Props) {
+  const [valueTask, setValueTask] = useState<Task>();
 
   return (
-    <Droppable
-      droppableId={status}
-      ignoreContainerClipping={true}
-      isDropDisabled={false}
-      isCombineEnabled={false}
-      direction="vertical"
-    >
-      {(provided, snapshot) => (
-        <div
-          className={`p-4 rounded shadow min-w-[250px] min-h-[150px] transition-colors ${
-            snapshot.isDraggingOver ? "bg-blue-50" : "bg-gray-100"
-          }`}
-        >
-          <h3
-            className="text-lg font-bold capitalize mb-2 cursor-move"
-            {...dragHandleProps}
-          >
-            {status}
-          </h3>
-          <div ref={provided.innerRef} {...provided.droppableProps}>
-            {filteredTasks.map((task, index) => (
-              <TaskCard key={task.id} index={index} task={task} />
-            ))}
-            {provided.placeholder}
-          </div>
-        </div>
+    <>
+      {!!valueTask && (
+        <TaskFormModal
+          taskListId={taskList.task_list_id}
+          onClose={() => {
+            setValueTask(undefined);
+          }}
+          onSubmit={() => {
+            getData();
+            setValueTask(undefined);
+          }}
+          taskDetails={valueTask}
+        />
       )}
-    </Droppable>
+      <Droppable
+        droppableId={taskList.status}
+        ignoreContainerClipping={true}
+        isDropDisabled={false}
+        isCombineEnabled={false}
+        direction="vertical"
+      >
+        {(provided, snapshot) => (
+          // min-h-[150px]
+          <div
+            className={`p-2 rounded shadow w-[300px]  transition-colors ${
+              snapshot.isDraggingOver ? "bg-blue-50" : "bg-gray-200"
+            }`}
+          >
+            <h3
+              className="px-2 text-lg font-bold mb-2 cursor-move"
+              {...dragHandleProps}
+            >
+              {statusToLabel(taskList.status)}
+            </h3>
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              {taskList.tasks.map((task, index) => (
+                <TaskCard
+                  key={task.id}
+                  index={index}
+                  task={task}
+                  handleClick={(task) => {
+                    setValueTask(task);
+                  }}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+            <button
+              className="p-1 cursor-pointer flex flex-row items-center w-full rounded text-sm hover:bg-gray-50"
+              onClick={() => {
+                setValueTask({ ...taskDefault });
+              }}
+            >
+              <FiPlus className="mx-2" />
+              Aggiungi una scheda
+            </button>
+          </div>
+        )}
+      </Droppable>
+    </>
   );
 }

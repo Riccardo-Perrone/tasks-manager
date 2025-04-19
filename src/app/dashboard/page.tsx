@@ -1,146 +1,141 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import TaskList from "../components/TaskList";
-import { Task, TaskStatus } from "../utils/types";
+import { Task, TaskListType } from "../utils/types";
 import {
   DragDropContext,
   DropResult,
   Droppable,
   Draggable,
 } from "@hello-pangea/dnd";
-import TaskFormModal from "../components/TaskFormModal";
-
-const tasksMockToDo: Task[] = [
-  {
-    id: "task-1",
-    title: "Titolo 1",
-    status: TaskStatus.ToDo,
-    timeEstimated: 3,
-    description: "Descrizione",
-  },
-  {
-    id: "task-4",
-    title: "Titolo 4",
-    status: TaskStatus.ToDo,
-    timeEstimated: 3,
-    description: "Descrizione",
-  },
-  {
-    id: "task-5",
-    title: "Titolo 5",
-    status: TaskStatus.ToDo,
-    timeEstimated: 3,
-    description: "Descrizione",
-  },
-];
-const tasksMockProgress: Task[] = [
-  {
-    id: "task-2",
-    title: "Titolo 2",
-    status: TaskStatus.InProgress,
-    timeEstimated: 2,
-    description: "Descrizione",
-  },
-];
-const tasksMockDone: Task[] = [
-  {
-    id: "task-3",
-    title: "Titolo 3",
-    status: TaskStatus.Done,
-    timeEstimated: 2,
-    description: "Descrizione",
-  },
-];
-
-type TaskColumns = {
-  [key: string]: Task[];
-};
 
 export default function DashboardClient() {
-  const [columnOrder, setColumnOrder] = useState<TaskStatus[]>([
-    TaskStatus.ToDo,
-    TaskStatus.InProgress,
-    TaskStatus.Done,
-  ]);
-
-  const [tasksByStatus, setTasksByStatus] = useState<TaskColumns>({
-    [TaskStatus.ToDo]: tasksMockToDo,
-    [TaskStatus.InProgress]: tasksMockProgress,
-    [TaskStatus.Done]: tasksMockDone,
-  });
-  const [open, setOpen] = useState(false);
+  const [taskLists, setTaskLists] = useState<TaskListType[]>([]);
 
   useEffect(() => {
-    // Esegui la richiesta GET per ottenere i task
-    fetch("http://localhost:8080/api/tasks")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Errore nella risposta");
-        }
-        return response.json(); // Analizza la risposta JSON
-      })
-      .then((data) => {
-        console.log("Task ricevuti:", data);
-        // Qui puoi fare qualcosa con i dati, ad esempio, renderizzarli in una lista
-      })
-      .catch((error) => {
-        console.error("Errore durante la richiesta:", error);
-      });
+    getData();
   }, []);
 
+  const getData = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/tasks");
+      if (!res.ok) throw new Error("Errore nella richiesta");
+
+      const data: TaskListType[] = await res.json();
+      const sorted = data.sort((a, b) => a.order_list - b.order_list);
+      setTaskLists(sorted);
+    } catch (err) {
+      console.error("Errore durante il fetch:", err);
+    }
+  };
+
   const onDragEnd = (result: DropResult) => {
-    const { source, destination, type } = result;
+    const { source, destination, type, combine, draggableId } = result;
+
+    console.log(result);
+
     if (!destination) return;
 
     if (type === "column") {
-      const newColumnOrder = [...columnOrder];
-      const [removed] = newColumnOrder.splice(source.index, 1);
-      newColumnOrder.splice(destination.index, 0, removed);
-      setColumnOrder(newColumnOrder);
+      const newOrder = [...taskLists];
+      const [moved] = newOrder.splice(source.index, 1);
+      newOrder.splice(destination.index, 0, moved);
+      // TODO: chiamare db per aggiorare ordine
+      setTaskLists(newOrder);
+      newOrder.forEach((e, key) => {
+        if (e.order_list !== key) updateOrderList(e.task_list_id, key);
+      });
       return;
     }
 
-    const sourceStatus = source.droppableId;
-    const destStatus = destination.droppableId;
+    const sourceList = taskLists.find(
+      (list) => list.status === source.droppableId
+    );
+    const destList = taskLists.find(
+      (list) => list.status === destination.droppableId
+    );
 
-    const sourceTasks = [...tasksByStatus[sourceStatus]];
-    const destTasks = [...tasksByStatus[destStatus]];
+    if (!sourceList || !destList) return;
 
-    const [movedTask] = sourceTasks.splice(source.index, 1);
+    const sourceTasks = [...sourceList.tasks];
+    const destTasks = [...destList.tasks];
 
-    if (sourceStatus === destStatus) {
+    const [movedTask]: Task[] = sourceTasks.splice(source.index, 1);
+
+    if (sourceList.status === destList.status) {
       sourceTasks.splice(destination.index, 0, movedTask);
-      setTasksByStatus({
-        ...tasksByStatus,
-        [sourceStatus]: sourceTasks,
-      });
+      updateTaskLists(sourceList.task_list_id, sourceTasks);
     } else {
-      const updatedTask = { ...movedTask, status: destStatus as TaskStatus };
-      destTasks.splice(destination.index, 0, updatedTask);
-      setTasksByStatus({
-        ...tasksByStatus,
-        [sourceStatus]: sourceTasks,
-        [destStatus]: destTasks,
-      });
+      destTasks.splice(destination.index, 0, movedTask);
+      updateTaskLists(sourceList.task_list_id, sourceTasks);
+      updateTaskLists(destList.task_list_id, destTasks);
     }
+  };
+
+  const updateTaskLists = (task_list_id: string, updatedTasks: Task[]) => {
+    updatedTasks.forEach((element, key) => {
+      if (key !== element.order_task || element.task_list_id !== task_list_id) {
+        const updatedTask: Task = {
+          ...element,
+          order_task: key,
+          task_list_id,
+        };
+        moveTask(updatedTask);
+        updatedTasks[key] = updatedTask;
+      }
+    });
+
+    setTaskLists((prev) =>
+      prev.map((list) =>
+        list.task_list_id === task_list_id
+          ? { ...list, tasks: updatedTasks }
+          : list
+      )
+    );
+  };
+
+  const moveTask = async (newTask: Task) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/tasks/move-task/${newTask.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            task_list_id: newTask.task_list_id,
+            order_task: newTask.order_task,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Errore:", errorData.error);
+      } else {
+        const updatedTask = await response.json();
+        console.log("Task aggiornata:", updatedTask);
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+      getData();
+    }
+  };
+
+  const updateOrderList = async (task_list_id: string, order: number) => {
+    const response = await fetch(
+      `http://localhost:8080/api/tasks-list/change-order/${task_list_id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_list: order,
+        }),
+      }
+    );
   };
 
   return (
     <div className="overflow-auto h-screen">
-      <button
-        onClick={() => setOpen(true)}
-        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-      >
-        Nuova Task
-      </button>
-
-      <TaskFormModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={() => {
-          //
-        }}
-      />
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable
           droppableId="all-columns"
@@ -153,8 +148,12 @@ export default function DashboardClient() {
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {columnOrder.map((status, index) => (
-                <Draggable key={status} draggableId={status} index={index}>
+              {taskLists.map((list, index) => (
+                <Draggable
+                  key={list.status}
+                  draggableId={list.status}
+                  index={index}
+                >
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
@@ -162,15 +161,14 @@ export default function DashboardClient() {
                       className="min-w-[300px] m-2"
                     >
                       <TaskList
-                        status={status}
-                        tasks={tasksByStatus[status]}
+                        taskList={list}
                         dragHandleProps={provided.dragHandleProps!}
+                        getData={getData}
                       />
                     </div>
                   )}
                 </Draggable>
               ))}
-
               {provided.placeholder}
             </div>
           )}
