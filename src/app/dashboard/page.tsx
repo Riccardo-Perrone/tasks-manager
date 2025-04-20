@@ -8,9 +8,12 @@ import {
   Droppable,
   Draggable,
 } from "@hello-pangea/dnd";
+import api from "@/src/lib/axios";
+import { useToast } from "../utils/ToastProvider";
 
 export default function DashboardClient() {
   const [taskLists, setTaskLists] = useState<TaskListType[]>([]);
+  const { showToast } = useToast();
 
   useEffect(() => {
     getData();
@@ -18,14 +21,14 @@ export default function DashboardClient() {
 
   const getData = async () => {
     try {
-      const res = await fetch("/api/tasks", { method: "GET" });
-      if (!res.ok) throw new Error("Errore nella richiesta");
+      const res = await api.get<TaskListType[]>("/tasks");
+      console.log(res);
 
-      const data: TaskListType[] = await res.json();
-      const sorted = data.sort((a, b) => a.order_list - b.order_list);
+      const sorted = res.data.sort((a, b) => a.order_list - b.order_list);
       setTaskLists(sorted);
-    } catch (err) {
-      console.error("Errore durante il fetch:", err);
+    } catch (error) {
+      console.log(error);
+      showToast(`Errore caricamento dati. Riprovare piu tardi`, "error");
     }
   };
 
@@ -94,39 +97,26 @@ export default function DashboardClient() {
 
   const moveTask = async (newTask: Task) => {
     try {
-      const response = await fetch(`/api/tasks/move-task/${newTask.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          task_list_id: newTask.task_list_id,
-          order_task: newTask.order_task,
-        }),
+      await api.put(`/tasks/move-task/${newTask.id}`, {
+        task_list_id: newTask.task_list_id,
+        order_task: newTask.order_task,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Errore:", errorData.error);
-      } else {
-        const updatedTask = await response.json();
-        console.log("Task aggiornata:", updatedTask);
-      }
     } catch (error) {
       console.error("Errore di rete:", error);
       getData();
+      showToast(`Errore spostamento task. Riprovare`, "error");
     }
   };
 
   const updateOrderList = async (task_list_id: string, order: number) => {
-    const response = await fetch(
-      `/api/tasks-list/change-order/${task_list_id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          order_list: order,
-        }),
-      }
-    );
+    try {
+      await api.put(`/tasks-list/change-order/${task_list_id}`, {
+        order_list: order,
+      });
+    } catch (error) {
+      getData();
+      showToast(`Errore spostamento liste task. Riprovare`, "error");
+    }
   };
 
   return (

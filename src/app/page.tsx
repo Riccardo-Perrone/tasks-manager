@@ -17,7 +17,7 @@ export default function Home() {
           gestione di quelli esistenti
         </section>
       </div>
-      {/* <img src="/home_image.svg" alt="home_image" /> */}
+      <img src="/home_image.svg" alt="home_image" />
     </div>
   );
 }

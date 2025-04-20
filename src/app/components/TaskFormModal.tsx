@@ -15,6 +15,8 @@ import Editor, {
   BtnStrikeThrough,
   BtnUnderline,
 } from "react-simple-wysiwyg";
+import { useToast } from "../utils/ToastProvider";
+import api from "@/src/lib/axios";
 
 type TaskId = {
   id: string;
@@ -40,6 +42,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
   const [taskList, setTaskList] = useState<TaskId[]>([]);
   const [taskListIdState, setTaskListIdState] = useState<string>(taskListId);
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!!taskDetails) {
@@ -54,14 +57,26 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
 
   const getStatusData = async () => {
     try {
-      const res = await fetch("/api/tasks-list");
-      if (!res.ok) throw new Error("Errore nella richiesta");
-
-      const data: TaskId[] = await res.json();
-      const sorted = data.sort((a, b) => a.order_list - b.order_list);
+      const res = await api.get<TaskId[]>("/tasks-list");
+      const sorted = res.data.sort((a, b) => a.order_list - b.order_list);
       setTaskList(sorted);
     } catch (err) {
-      console.error("Errore durante il fetch:", err);
+      showToast(
+        `Errore caricamento detagli task. Riprovare piu tardi`,
+        "error"
+      );
+    }
+  };
+
+  const getSingleTask = async (id: string) => {
+    try {
+      const response = await api.get<Task>(`/tasks/${id}`);
+      setForm(response.data);
+    } catch (error) {
+      showToast(
+        `Errore caricamento detagli task. Riprovare piu tardi`,
+        "error"
+      );
     }
   };
 
@@ -92,93 +107,39 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
     }
   };
 
-  const getSingleTask = async (id: string) => {
-    try {
-      const response = await fetch(`/api/tasks/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Errore:", errorData.error);
-      } else {
-        const singleTask = await response.json();
-        console.log("Task trovata con successo:", singleTask);
-        setForm(singleTask);
-      }
-    } catch (error) {
-      console.error("Errore di rete:", error);
-    }
-  };
-
   const createNewTask = async (newTask: Task) => {
     try {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...newTask, task_list_id: taskListIdState }),
+      await api.post<Task>("/tasks", {
+        ...newTask,
+        task_list_id: taskListIdState,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Errore:", errorData.error);
-      } else {
-        const createdTask = await response.json();
-        console.log("Task creata con successo:", createdTask);
-        onSubmit();
-      }
+      onSubmit();
     } catch (error) {
-      console.error("Errore di rete:", error);
+      showToast(`Errore creazione task, Riprovare`, "error");
     }
   };
+
   const updateTask = async (newTask: Task) => {
     try {
-      const response = await fetch(`/api/tasks/${newTask.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...newTask, task_list_id: taskListIdState }),
+      await api.put(`/tasks/${newTask.id}`, {
+        ...newTask,
+        task_list_id: taskListIdState,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Errore:", errorData.error);
-      } else {
-        const updatedTask = await response.json();
-        console.log("Task modificata con successo:", updatedTask);
-        onSubmit();
-      }
+      onSubmit();
     } catch (error) {
-      console.error("Errore di rete:", error);
+      showToast(`Errore modifica task, Riprovare`, "error");
     }
   };
 
   const deleteTask = async (id: string) => {
     try {
-      const response = await fetch(`/api/tasks/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await api.delete(`/tasks/${id}`);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Errore:", errorData.error);
-      } else {
-        const deletedTask = await response.json();
-        console.log("Task eliminata con successo:", deletedTask);
-        setConfirmDelete(false);
-        onSubmit();
-      }
+      setConfirmDelete(false);
+      onSubmit();
     } catch (error) {
-      console.error("Errore di rete:", error);
+      showToast(`Errore eliminazione task, Riprovare`, "error");
     }
   };
 
