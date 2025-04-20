@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import InputCustom from "../../components/InputCustom";
+import api from "@/src/lib/axios";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/src/utils/ToastProvider";
 
 type SignUpType = {
   username: string;
@@ -9,12 +12,20 @@ type SignUpType = {
 
 function SignUp() {
   const [form, setForm] = useState<SignUpType>({ password: "", username: "" });
+  const { showToast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const user: SignUpType = {
       ...form,
     };
+    try {
+      await api.post("/users/signup", user);
+      router.push("/");
+    } catch (error) {
+      showToast("Errora nella registrazione, riprovare", "error");
+    }
   };
 
   const handleChange = (
@@ -31,7 +42,7 @@ function SignUp() {
   };
   return (
     <div className="bg-gray-200 p-6 rounded-lg w-full max-w-md shadow-lg relative m-2">
-      <h2 className="text-2xl font-bold mb-4">Create new account</h2>
+      <h2 className="text-2xl font-bold mb-4">Crea un nuovo account</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <InputCustom
@@ -50,7 +61,9 @@ function SignUp() {
           onChange={handleChange}
           required
         />
-
+        <a href="/login" className="text-xs">
+          Hai gia' un account? Accedi qui!
+        </a>
         <div className="flex justify-end space-x-2 pt-4">
           <button
             type="submit"

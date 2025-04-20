@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import InputCustom from "../../components/InputCustom";
+import api from "@/src/lib/axios";
+import { useToast } from "@/src/utils/ToastProvider";
+import { useRouter } from "next/navigation";
 
 type LoginType = {
   username: string;
@@ -9,12 +12,20 @@ type LoginType = {
 
 function Login() {
   const [form, setForm] = useState<LoginType>({ password: "", username: "" });
+  const { showToast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const user: LoginType = {
       ...form,
     };
+    try {
+      await api.post("/users/login", user);
+      router.push("/");
+    } catch (error) {
+      showToast("Errore nella login, riprovare", "error");
+    }
   };
 
   const handleChange = (
@@ -50,6 +61,10 @@ function Login() {
           onChange={handleChange}
           required
         />
+
+        <a href="/signup" className="text-xs">
+          Non hai un account? Registrati qui!
+        </a>
 
         <div className="flex justify-end space-x-2 pt-4">
           <button
