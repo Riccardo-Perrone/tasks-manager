@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import TaskList from "../components/TaskList";
-import { Task, TaskListType } from "../utils/types";
 import {
   DragDropContext,
   DropResult,
@@ -9,7 +7,9 @@ import {
   Draggable,
 } from "@hello-pangea/dnd";
 import api from "@/src/lib/axios";
-import { useToast } from "../utils/ToastProvider";
+import { Task, TaskListType } from "@/src/utils/types";
+import { useToast } from "@/src/utils/ToastProvider";
+import TaskList from "../../components/TaskList";
 
 export default function DashboardClient() {
   const [taskLists, setTaskLists] = useState<TaskListType[]>([]);

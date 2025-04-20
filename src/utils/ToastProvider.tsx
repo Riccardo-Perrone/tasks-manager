@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useState, ReactNode, useContext } from "react";
-import Toast from "../components/Toats"; // Importa il componente Toast
+import Toast from "../app/components/Toats";
 
 // Tipizzazione delle props per ToastContext
 export interface ToastContextType {

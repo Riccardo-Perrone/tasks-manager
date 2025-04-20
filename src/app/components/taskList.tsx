@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Task, TaskListType, TaskStatus } from "../utils/types";
+import { Task, TaskListType, TaskStatus } from "@/src/utils/types";
 import TaskCard from "./TaskCard";
 import { Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 //icons
 import { FiPlus } from "react-icons/fi";
 import TaskFormModal, { taskDefault } from "./TaskFormModal";
-import { statusToLabel } from "../utils/statusToLabel";
+import { statusToLabel } from "@/src/utils/statusToLabel";
 
 interface Props {
   taskList: TaskListType;

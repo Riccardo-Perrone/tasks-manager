@@ -1,9 +1,9 @@
 import React from "react";
-import { Task } from "../utils/types";
 import { Draggable } from "@hello-pangea/dnd";
 //icons
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { FaRegEdit } from "react-icons/fa";
+import { Task } from "@/src/utils/types";
 
 interface Props {
   task: Task;

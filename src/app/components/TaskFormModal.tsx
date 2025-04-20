@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Task, TaskStatus } from "../utils/types";
+import { Task, TaskStatus } from "@/src/utils/types";
 import { MdDelete } from "react-icons/md";
-import { statusToLabel } from "../utils/statusToLabel";
+import { statusToLabel } from "@/src/utils/statusToLabel";
 import InputCustom from "./InputCustom";
 import Editor, {
   BtnBold,
@@ -15,7 +15,7 @@ import Editor, {
   BtnStrikeThrough,
   BtnUnderline,
 } from "react-simple-wysiwyg";
-import { useToast } from "../utils/ToastProvider";
+import { useToast } from "@/src/utils/ToastProvider";
 import api from "@/src/lib/axios";
 
 type TaskId = {
@@ -88,7 +88,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
       | ContentEditableEvent
   ) => {
     const { name, value } = e.target;
-    if (!name || !value) return;
+    if (!name) return;
     setForm((prev) => ({
       ...prev,
       [name]: name === "time_estimated" ? Number(value) : value,
@@ -230,7 +230,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
             label="Tempo stimato (ore)"
             name="time_estimated"
             type="number"
-            value={form.time_estimated || undefined}
+            value={form.time_estimated}
             onChange={handleChange}
             min={0}
           />
