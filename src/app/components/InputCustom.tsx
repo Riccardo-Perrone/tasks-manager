@@ -1,13 +1,15 @@
 import React, { InputHTMLAttributes } from "react";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
 }
 
 function InputCustom({ label, ...inputProps }: Props) {
   return (
     <div>
-      <label className="block text-sm text-gray-700 font-bold">{label}</label>
+      {label && (
+        <label className="block text-sm text-gray-700 font-bold">{label}</label>
+      )}
       <input
         {...inputProps}
         value={inputProps.value ?? ""}

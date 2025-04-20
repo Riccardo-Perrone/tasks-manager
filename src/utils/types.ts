@@ -17,5 +17,5 @@ export type Task = {
   title: string;
   time_estimated?: number;
   description?: string;
-  task_list_id?: string;
+  task_list_id: string;
 };

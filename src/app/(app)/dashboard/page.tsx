@@ -10,10 +10,14 @@ import api from "@/src/lib/axios";
 import { Task, TaskListType } from "@/src/utils/types";
 import { useToast } from "@/src/utils/ToastProvider";
 import TaskList from "../../components/TaskList";
+import ScearchTask from "../../components/ScearchTask";
+import TaskFormModal from "../../components/TaskFormModal";
 
 export default function DashboardClient() {
-  const [taskLists, setTaskLists] = useState<TaskListType[]>([]);
   const { showToast } = useToast();
+
+  const [taskLists, setTaskLists] = useState<TaskListType[]>([]);
+  const [valueTask, setValueTask] = useState<Task>();
 
   useEffect(() => {
     getData();
@@ -22,7 +26,6 @@ export default function DashboardClient() {
   const getData = async () => {
     try {
       const res = await api.get<TaskListType[]>("/tasks");
-      console.log(res);
 
       const sorted = res.data.sort((a, b) => a.order_list - b.order_list);
       setTaskLists(sorted);
@@ -33,7 +36,7 @@ export default function DashboardClient() {
   };
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination, type, combine, draggableId } = result;
+    const { source, destination, type } = result;
 
     if (!destination) return;
 
@@ -120,7 +123,23 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="overflow-auto h-screen w-full">
+    <div className="w-full flex flex-col flex-1">
+      <ScearchTask
+        taskList={taskLists.flatMap((e) => e.tasks)}
+        handleClick={setValueTask}
+      />
+      {!!valueTask && (
+        <TaskFormModal
+          onClose={() => {
+            setValueTask(undefined);
+          }}
+          onSubmit={() => {
+            getData();
+            setValueTask(undefined);
+          }}
+          taskDetails={valueTask}
+        />
+      )}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable
           droppableId="all-columns"
@@ -129,7 +148,7 @@ export default function DashboardClient() {
         >
           {(provided) => (
             <div
-              className="flex flex-row"
+              className="flex flex-row overflow-auto flex-1"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -148,7 +167,7 @@ export default function DashboardClient() {
                       <TaskList
                         taskList={list}
                         dragHandleProps={provided.dragHandleProps!}
-                        getData={getData}
+                        taskForm={setValueTask}
                       />
                     </div>
                   )}

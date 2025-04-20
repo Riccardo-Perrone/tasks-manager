@@ -1,44 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Task, TaskListType, TaskStatus } from "@/src/utils/types";
+import React from "react";
+import { Task, TaskListType } from "@/src/utils/types";
 import TaskCard from "./TaskCard";
 import { Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 //icons
 import { FiPlus } from "react-icons/fi";
-import TaskFormModal, { taskDefault } from "./TaskFormModal";
+import { taskDefault } from "./TaskFormModal";
 import { statusToLabel } from "@/src/utils/statusToLabel";
 
 interface Props {
   taskList: TaskListType;
   dragHandleProps?: DraggableProvidedDragHandleProps;
-  getData: () => void;
+  taskForm: (task: Task) => void;
 }
 
 export default function TaskList({
   dragHandleProps,
   taskList,
-  getData,
+  taskForm,
 }: Props) {
-  const [valueTask, setValueTask] = useState<Task>();
-
-  useEffect(() => {
-    console.log(valueTask);
-  }, [valueTask]);
-
   return (
     <>
-      {!!valueTask && (
-        <TaskFormModal
-          taskListId={taskList.task_list_id}
-          onClose={() => {
-            setValueTask(undefined);
-          }}
-          onSubmit={() => {
-            getData();
-            setValueTask(undefined);
-          }}
-          taskDetails={valueTask}
-        />
-      )}
       <Droppable
         droppableId={taskList.status}
         ignoreContainerClipping={true}
@@ -66,7 +47,7 @@ export default function TaskList({
                   index={index}
                   task={task}
                   handleClick={(task) => {
-                    setValueTask(task);
+                    taskForm(task);
                   }}
                 />
               ))}
@@ -75,7 +56,10 @@ export default function TaskList({
             <button
               className="p-1 cursor-pointer flex flex-row items-center w-full rounded text-sm hover:bg-gray-50"
               onClick={() => {
-                setValueTask({ ...taskDefault });
+                taskForm({
+                  ...taskDefault,
+                  task_list_id: taskList.task_list_id,
+                });
               }}
             >
               <FiPlus className="mx-2" />

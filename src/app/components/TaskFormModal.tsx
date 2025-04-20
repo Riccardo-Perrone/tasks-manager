@@ -28,19 +28,18 @@ interface Props {
   taskDetails?: Task;
   onSubmit: () => void;
   onClose: () => void;
-  taskListId: string;
 }
 
 export const taskDefault: Task = {
   title: "",
   description: "",
+  task_list_id: "",
   order_task: 0,
 };
 
-function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
+function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
   const [form, setForm] = useState<Task>(taskDefault);
   const [taskList, setTaskList] = useState<TaskId[]>([]);
-  const [taskListIdState, setTaskListIdState] = useState<string>(taskListId);
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const { showToast } = useToast();
 
@@ -111,7 +110,6 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
     try {
       await api.post<Task>("/tasks", {
         ...newTask,
-        task_list_id: taskListIdState,
       });
       onSubmit();
     } catch (error) {
@@ -123,7 +121,6 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
     try {
       await api.put(`/tasks/${newTask.id}`, {
         ...newTask,
-        task_list_id: taskListIdState,
       });
 
       onSubmit();
@@ -213,9 +210,9 @@ function TaskFormModal({ onClose, onSubmit, taskDetails, taskListId }: Props) {
               Stato
             </label>
             <select
-              name="status"
-              value={taskListIdState}
-              onChange={(e) => setTaskListIdState(e.target.value)}
+              name="task_list_id"
+              value={form.task_list_id}
+              onChange={handleChange}
               className="mt-1 w-full border bg-white border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-500"
             >
               {taskList.map((status) => (
