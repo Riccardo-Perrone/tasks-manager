@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import db from "@/db/db";
-import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,8 +23,6 @@ export async function POST(req: NextRequest) {
     if (!passwordMatch) {
       return NextResponse.json({ error: "Password errata" }, { status: 401 });
     }
-
-    (await cookies()).set("user_id", user.id, { httpOnly: true });
 
     return NextResponse.json({
       message: "Login riuscito",

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 import { hashPassword } from "@/src/utils/hashPassowrd";
-import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,8 +25,6 @@ export async function POST(req: NextRequest) {
       [username, hashed]
     );
     const user = result.rows[0];
-
-    (await cookies()).set("user_id", user.id, { httpOnly: true });
 
     return NextResponse.json(user.username, { status: 201 });
   } catch (err) {

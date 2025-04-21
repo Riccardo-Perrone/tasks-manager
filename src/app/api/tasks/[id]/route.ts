@@ -9,13 +9,28 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const result = await db.query("SELECT * FROM tasks WHERE id = $1", [id]);
+    const responseTask = await db.query("SELECT * FROM tasks WHERE id = $1", [
+      id,
+    ]);
 
-    if (result.rows.length === 0) {
+    if (responseTask.rows.length === 0) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    const responseComments = await db.query(
+      `SELECT c.message, u.username, c.created_at
+        FROM comments c
+        JOIN users u ON c.author_id = u.id
+        WHERE c.task_id = $1
+        ORDER BY c.created_at DESC;
+        `,
+      [id]
+    );
+
+    return NextResponse.json({
+      ...responseTask.rows[0],
+      comments: responseComments.rows,
+    });
   } catch (err) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }

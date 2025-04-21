@@ -18,4 +18,11 @@ export type Task = {
   time_estimated?: number;
   description?: string;
   task_list_id: string;
+  comments: Comment[];
+};
+
+export type Comment = {
+  username: string;
+  created_at: string;
+  message: string;
 };

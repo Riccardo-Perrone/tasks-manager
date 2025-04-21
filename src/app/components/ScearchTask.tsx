@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import InputCustom from "./InputCustom";
 import { Task } from "@/src/utils/types";
+//icons
+import { CiSearch } from "react-icons/ci";
 
 interface Props {
   taskList: Task[];
@@ -37,6 +39,7 @@ function ScearchTask({ taskList, handleClick }: Props) {
           placeholder="Cerca la tua task..."
           value={searchTerm}
           onChange={handleSearchChange}
+          endAdornment={<CiSearch />}
         />
         {filteredTasks.length > 0 && (
           <ul className="absolute left-0 right-0 z-10 bg-white mt-1 max-h-60 overflow-y-auto">

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Task, TaskStatus } from "@/src/utils/types";
-import { MdDelete } from "react-icons/md";
 import { statusToLabel } from "@/src/utils/statusToLabel";
 import InputCustom from "./InputCustom";
 import Editor, {
@@ -17,6 +16,9 @@ import Editor, {
 } from "react-simple-wysiwyg";
 import { useToast } from "@/src/utils/ToastProvider";
 import api from "@/src/lib/axios";
+//icons
+import { MdDelete } from "react-icons/md";
+import CommentSection from "./CommentSection";
 
 type TaskId = {
   id: string;
@@ -35,13 +37,15 @@ export const taskDefault: Task = {
   description: "",
   task_list_id: "",
   order_task: 0,
+  comments: [],
 };
 
 function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
+  const { showToast } = useToast();
+
   const [form, setForm] = useState<Task>(taskDefault);
   const [taskList, setTaskList] = useState<TaskId[]>([]);
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-  const { showToast } = useToast();
 
   useEffect(() => {
     if (!!taskDetails) {
@@ -187,6 +191,9 @@ function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
           />
 
           <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Descrizione
+            </label>
             <Editor
               value={form.description || ""}
               onChange={handleChange}
@@ -232,6 +239,14 @@ function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
             min={0}
           />
 
+          {form.id && (
+            <CommentSection
+              comments={form.comments}
+              handleCreate={() => getSingleTask(form.id!)}
+              task_id={form.id}
+            />
+          )}
+
           <div className="flex justify-end space-x-2 pt-4">
             <button
               type="button"
@@ -240,10 +255,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
             >
               Annulla
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-neutral-700 text-white rounded-md hover:bg-neutral-500 cursor-pointer"
-            >
+            <button className="px-4 py-2 bg-neutral-700 text-white rounded-md hover:bg-neutral-500 cursor-pointer">
               Salva
             </button>
           </div>

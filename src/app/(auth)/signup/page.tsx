@@ -4,6 +4,7 @@ import InputCustom from "../../components/InputCustom";
 import api from "@/src/lib/axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/src/utils/ToastProvider";
+import Cookies from "js-cookie";
 
 type SignUpType = {
   username: string;
@@ -21,7 +22,9 @@ function SignUp() {
       ...form,
     };
     try {
-      await api.post("/users/signup", user);
+      const userLogged = await api.post("/users/signup", user);
+      Cookies.set("user_id", userLogged.data.user.id);
+
       router.push("/");
     } catch (error) {
       showToast("Errora nella registrazione, riprovare", "error");

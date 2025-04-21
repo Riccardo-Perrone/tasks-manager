@@ -5,6 +5,14 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS tasks_list;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS comments;
+
+-- Crea tabella tasks_list
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL
+);
 
 -- Crea tabella tasks_list
 CREATE TABLE tasks_list (
@@ -30,17 +38,11 @@ CREATE TABLE tasks (
   task_list_id UUID REFERENCES tasks_list(id) ON DELETE CASCADE
 );
 
--- Crea tabella tasks_list
-CREATE TABLE users (
+-- Crea tabella comments con relazioni a tasks e users
+CREATE TABLE comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  username TEXT NOT NULL UNIQUE,
-  password TEXT NOT NULL
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  author_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  task_id UUID REFERENCES tasks(id) ON DELETE CASCADE
 );
-
--- Qui potrai aggiungere anche altre tabelle:
--- DROP TABLE IF EXISTS users;
--- CREATE TABLE users (
---   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
---   username TEXT NOT NULL,
---   ...
--- );
