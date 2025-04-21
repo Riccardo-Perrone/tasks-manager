@@ -26,7 +26,10 @@ export async function POST(req: NextRequest) {
     );
     const user = result.rows[0];
 
-    return NextResponse.json(user.username, { status: 201 });
+    return NextResponse.json({
+      message: "SignUp riuscita",
+      user: { id: user.id, username: user.username },
+    });
   } catch (err) {
     console.error(err);
     return NextResponse.json(

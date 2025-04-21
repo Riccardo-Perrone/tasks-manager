@@ -26,3 +26,9 @@ export type Comment = {
   created_at: string;
   message: string;
 };
+
+export type Projects = {
+  name: string;
+  id: string;
+  created_at: string;
+};

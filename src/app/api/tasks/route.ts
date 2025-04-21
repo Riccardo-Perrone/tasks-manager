@@ -1,54 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-export async function GET(req: NextRequest) {
-  try {
-    const result = await db.query(`
-      SELECT 
-        tl.id AS task_list_id,
-        tl.status,
-        tl.order_list,
-        t.id AS task_id,
-        t.title,
-        t.time_estimated,
-        t.order_task
-      FROM tasks_list tl
-      LEFT JOIN tasks t ON t.task_list_id = tl.id
-      ORDER BY tl.order_list, t.order_task;
-    `);
-
-    const grouped: Record<string, any> = {};
-    for (const row of result.rows) {
-      const listKey = row.status;
-      if (!grouped[listKey]) {
-        grouped[listKey] = {
-          status: row.status,
-          order_list: row.order_list,
-          task_list_id: row.task_list_id,
-          tasks: [],
-        };
-      }
-      if (row.task_id) {
-        grouped[listKey].tasks.push({
-          id: row.task_id,
-          title: row.title,
-          time_estimated: row.time_estimated,
-          order_task: row.order_task,
-        });
-      }
-    }
-
-    const response = Object.values(grouped).sort(
-      (a: any, b: any) => a.order_list - b.order_list
-    );
-
-    return NextResponse.json(response);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
-}
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -70,8 +22,8 @@ export async function POST(req: NextRequest) {
 
     const result = await db.query(
       `INSERT INTO tasks (title, description, time_estimated, order_task, task_list_id)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING *`,
       [title, description, time_estimated, newOrder, task_list_id]
     );
 

@@ -19,6 +19,7 @@ import api from "@/src/lib/axios";
 //icons
 import { MdDelete } from "react-icons/md";
 import CommentSection from "./CommentSection";
+import { useParams } from "next/navigation";
 
 type TaskId = {
   id: string;
@@ -42,6 +43,7 @@ export const taskDefault: Task = {
 
 function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
   const { showToast } = useToast();
+  const { id } = useParams();
 
   const [form, setForm] = useState<Task>(taskDefault);
   const [taskList, setTaskList] = useState<TaskId[]>([]);
@@ -60,7 +62,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
 
   const getStatusData = async () => {
     try {
-      const res = await api.get<TaskId[]>("/tasks-list");
+      const res = await api.get<TaskId[]>(`/tasks-list/${id}`);
       const sorted = res.data.sort((a, b) => a.order_list - b.order_list);
       setTaskList(sorted);
     } catch (err) {

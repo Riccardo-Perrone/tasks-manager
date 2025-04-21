@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-// GET /api/tasks/:id
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -35,7 +34,6 @@ export async function GET(
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-// PUT /api/tasks/:id
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -78,7 +76,6 @@ export async function PUT(
   }
 }
 
-// DELETE /api/tasks/:id
 export async function DELETE(
   _: NextRequest,
   { params }: { params: { id: string } }

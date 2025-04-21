@@ -2,10 +2,11 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Drop tabelle esistenti
+DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS tasks_list;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS projects;
 
 -- Crea tabella tasks_list
 CREATE TABLE users (
@@ -15,17 +16,19 @@ CREATE TABLE users (
 );
 
 -- Crea tabella tasks_list
-CREATE TABLE tasks_list (
+CREATE TABLE projects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  status TEXT NOT NULL UNIQUE,
-  order_list INTEGER NOT NULL
+  name TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Inserisce valori di default per le task list
-INSERT INTO tasks_list (status, order_list) VALUES
-  ('to-do', 0),
-  ('in-progress', 1),
-  ('done', 2);
+-- Crea tabella tasks_list
+CREATE TABLE tasks_list (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  status TEXT NOT NULL,
+  order_list INTEGER NOT NULL,
+  projects_id UUID REFERENCES projects(id) ON DELETE CASCADE
+);
 
 -- Crea tabella tasks con relazione a tasks_list
 CREATE TABLE tasks (

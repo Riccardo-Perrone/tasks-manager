@@ -1,8 +1,30 @@
-// src/app/api/tasks-list/change-order/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-// PUT /api/tasks-list/change-order/:id
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = await params;
+
+  try {
+    const result = await db.query(
+      `
+      SELECT id, status, order_list
+      FROM tasks_list
+      WHERE projects_id = $1 
+    `,
+      [id]
+    );
+    return NextResponse.json(result.rows);
+  } catch (err) {
+    return NextResponse.json(
+      { error: `Server error: ${err}` },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }

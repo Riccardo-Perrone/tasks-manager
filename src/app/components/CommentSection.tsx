@@ -65,9 +65,12 @@ function CommentSection({ comments, task_id, handleCreate }: Props) {
           </button>
         }
       />
-      <div className="my-4">
-        {comments?.map((e) => (
-          <div className="flex flex-col border-2 border-white p-1 mb-2 text-sm rounded">
+      <div className="my-4 max-h-35 overflow-auto">
+        {comments?.map((e, key) => (
+          <div
+            key={key}
+            className="flex flex-col border-2 border-white p-1 mb-2 text-sm rounded"
+          >
             <div className="text-xs mx-2 italic flex justify-between">
               <span className="font-bold">{e.username}</span>
               <span>{formattedDate(e.created_at)}</span>
