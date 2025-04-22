@@ -14,7 +14,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Create db tables
 
 ```bash
-npm run create-tables
+yarn run create-tables
 ```
 
 > [!WARNING]  
