@@ -41,7 +41,9 @@ function Sidebar() {
     try {
       const response = await api.get<Projects[]>("/projects");
       setProjects(response.data);
-    } catch (error) {}
+    } catch (error) {
+      showToast(`Errore nel raccoglimnto dati progetti.`, "error");
+    }
   };
 
   const handleLogout = () => {

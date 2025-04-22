@@ -54,6 +54,7 @@ function Login() {
           value={form.username}
           onChange={handleChange}
           required
+          autoComplete="username"
         />
 
         <InputCustom
@@ -63,6 +64,7 @@ function Login() {
           value={form.password}
           onChange={handleChange}
           required
+          autoComplete="current-password"
         />
 
         <a href="/signup" className="text-xs">
