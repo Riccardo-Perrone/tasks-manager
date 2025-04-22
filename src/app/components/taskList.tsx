@@ -2,10 +2,10 @@ import React from "react";
 import { Task, TaskListType } from "@/src/utils/types";
 import TaskCard from "./TaskCard";
 import { Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
-//icons
-import { FiPlus } from "react-icons/fi";
 import { taskDefault } from "./TaskFormModal";
 import { statusToLabel } from "@/src/utils/statusToLabel";
+//icons
+import { FiPlus } from "react-icons/fi";
 
 interface Props {
   taskList: TaskListType;

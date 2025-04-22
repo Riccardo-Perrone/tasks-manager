@@ -13,9 +13,10 @@ import TaskList from "@/src/app/components/TaskList";
 import ScearchTask from "@/src/app/components/ScearchTask";
 import TaskFormModal from "@/src/app/components/TaskFormModal";
 import { useParams } from "next/navigation";
-import { FiPlus } from "react-icons/fi";
 import Modal from "@/src/app/components/Modal";
 import InputCustom from "@/src/app/components/InputCustom";
+//icons
+import { FiPlus } from "react-icons/fi";
 
 export default function DashboardClient() {
   const { id } = useParams();
@@ -52,7 +53,6 @@ export default function DashboardClient() {
       const newOrder = [...taskLists];
       const [moved] = newOrder.splice(source.index, 1);
       newOrder.splice(destination.index, 0, moved);
-      // TODO: chiamare db per aggiorare ordine
       setTaskLists(newOrder);
       newOrder.forEach((e, key) => {
         if (e.order_list !== key) updateOrderList(e.task_list_id, key);
@@ -84,6 +84,7 @@ export default function DashboardClient() {
     }
   };
 
+  // Dopo aver mosso una task aggiorno la posizione di tutte le task che hanno cambiato posizione come effetto collaterale
   const updateTaskLists = (task_list_id: string, updatedTasks: Task[]) => {
     updatedTasks.forEach((element, key) => {
       if (key !== element.order_task || element.task_list_id !== task_list_id) {

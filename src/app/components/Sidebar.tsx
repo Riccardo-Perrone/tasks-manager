@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { FaTasks } from "react-icons/fa";
 import Modal from "./Modal";
 import InputCustom from "./InputCustom";
 import api from "@/src/lib/axios";
 import { useToast } from "@/src/utils/ToastProvider";
+import { Projects } from "@/src/utils/types";
+import { statusToLabel } from "@/src/utils/statusToLabel";
+import Link from "next/link";
 // icons
 import {
   IoIosArrowDropleftCircle,
@@ -15,10 +17,7 @@ import {
 import { IoMdHome } from "react-icons/io";
 import { IoMdLogOut } from "react-icons/io";
 import { IoAddCircleOutline } from "react-icons/io5";
-
-import { Projects } from "@/src/utils/types";
-import { statusToLabel } from "@/src/utils/statusToLabel";
-import Link from "next/link";
+import { FaTasks } from "react-icons/fa";
 
 function Sidebar() {
   const { id } = useParams();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Task, TaskStatus } from "@/src/utils/types";
+import { Task } from "@/src/utils/types";
 import { statusToLabel } from "@/src/utils/statusToLabel";
 import InputCustom from "./InputCustom";
 import Editor, {
@@ -16,14 +16,14 @@ import Editor, {
 } from "react-simple-wysiwyg";
 import { useToast } from "@/src/utils/ToastProvider";
 import api from "@/src/lib/axios";
-//icons
-import { MdDelete } from "react-icons/md";
 import CommentSection from "./CommentSection";
 import { useParams } from "next/navigation";
+//icons
+import { MdDelete } from "react-icons/md";
 
 type TaskId = {
   id: string;
-  status: TaskStatus;
+  status: string;
   order_list: number;
 };
 
@@ -50,6 +50,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   useEffect(() => {
+    // Se gli verra' passato un id il componente si comportera' come update della task altrimenti come create di una nuova task
     if (!!taskDetails) {
       if (!!taskDetails.id && taskDetails.id !== form.id) {
         getSingleTask(taskDetails.id);
@@ -60,6 +61,7 @@ function TaskFormModal({ onClose, onSubmit, taskDetails }: Props) {
     getStatusData();
   }, []);
 
+  // Prende i dettagli dei stati disponibili in questo progetto
   const getStatusData = async () => {
     try {
       const res = await api.get<TaskId[]>(`/tasks-list/${id}`);

@@ -2,12 +2,10 @@
 import React, { createContext, useState, ReactNode, useContext } from "react";
 import Toast from "../app/components/Toats";
 
-// Tipizzazione delle props per ToastContext
 export interface ToastContextType {
   showToast: (message: string, type: "success" | "error") => void;
 }
 
-// Tipizzazione del componente provider
 export interface ToastProviderProps {
   children: ReactNode;
 }
