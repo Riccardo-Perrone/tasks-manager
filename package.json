@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "create-tables": "node db/createTables.js",
-    "start-server": "node server.js"
+    "create-tables": "node db/createTables.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
