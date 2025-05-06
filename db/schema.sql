@@ -5,8 +5,8 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS tasks_list;
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS users;
 
 -- Crea tabella tasks_list
 CREATE TABLE users (
