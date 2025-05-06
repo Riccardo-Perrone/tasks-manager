@@ -18,8 +18,9 @@ CREATE TABLE users (
 -- Crea tabella tasks_list
 CREATE TABLE projects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL UNIQUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  name TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  creator_id UUID REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Crea tabella tasks_list
