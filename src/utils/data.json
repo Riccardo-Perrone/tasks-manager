@@ -1,0 +1,72 @@
+{
+    "users": [
+      {
+        "id": "b10f02ee-17a3-4b2f-835d-bb7054870f0d",
+        "username": "alice",
+        "password": "hashed_password_1"
+      },
+      {
+        "id": "bc11f715-7e13-468e-8908-5a4c682d6123",
+        "username": "bob",
+        "password": "hashed_password_2"
+      }
+    ],
+    "projects": [
+      {
+        "id": "8f7c2fd7-1e65-45d3-bd47-8eebd253f8fa",
+        "name": "Project Alpha",
+        "created_at": "2025-05-06T09:00:00Z"
+      }
+    ],
+    "tasks_list": [
+      {
+        "id": "4c6e1105-1b3f-49d4-97fc-20a06f4f5d71",
+        "status": "To Do",
+        "order_list": 1,
+        "projects_id": "8f7c2fd7-1e65-45d3-bd47-8eebd253f8fa"
+      },
+      {
+        "id": "98a6322f-09b1-4d14-8e13-41780cf5d9c0",
+        "status": "In Progress",
+        "order_list": 2,
+        "projects_id": "8f7c2fd7-1e65-45d3-bd47-8eebd253f8fa"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "a41f79cd-4e0b-4d90-91a3-d9ff75c6c120",
+        "title": "Design UI",
+        "description": "Create mockups for main screens",
+        "time_estimated": 8,
+        "order_task": 1,
+        "created_at": "2025-05-06T10:00:00Z",
+        "task_list_id": "4c6e1105-1b3f-49d4-97fc-20a06f4f5d71"
+      },
+      {
+        "id": "5d2279ae-3e63-4567-8397-bf5acbdef541",
+        "title": "Implement Login",
+        "description": "Develop backend and frontend for user login",
+        "time_estimated": 12,
+        "order_task": 1,
+        "created_at": "2025-05-06T11:00:00Z",
+        "task_list_id": "98a6322f-09b1-4d14-8e13-41780cf5d9c0"
+      }
+    ],
+    "comments": [
+      {
+        "id": "0db930c0-194b-4b64-bdd3-3a18076b2df2",
+        "message": "Started working on the UI designs.",
+        "created_at": "2025-05-06T12:00:00Z",
+        "author_id": "b10f02ee-17a3-4b2f-835d-bb7054870f0d",
+        "task_id": "a41f79cd-4e0b-4d90-91a3-d9ff75c6c120"
+      },
+      {
+        "id": "a36b6e49-9a3c-41db-87bc-bcf2b32f7f9a",
+        "message": "Backend login API is ready.",
+        "created_at": "2025-05-06T13:00:00Z",
+        "author_id": "bc11f715-7e13-468e-8908-5a4c682d6123",
+        "task_id": "5d2279ae-3e63-4567-8397-bf5acbdef541"
+      }
+    ]
+  }
+  

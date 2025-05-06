@@ -1,10 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import InputCustom from "../../components/InputCustom";
-import api from "@/src/lib/axios";
 import { useToast } from "@/src/utils/ToastProvider";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+
+//data mock
+import data from "@/src/utils/data.json";
 
 type LoginType = {
   username: string;
@@ -22,8 +24,15 @@ function Login() {
       ...form,
     };
     try {
-      const userLogged = await api.post("/users/login", user);
-      Cookies.set("user_id", userLogged.data.user.id);
+      const userLogged = data.users.find(
+        (userData) =>
+          userData.username == user.username &&
+          userData.password == user.password
+      );
+      if (!userLogged) {
+        throw new Error();
+      }
+      Cookies.set("user_id", userLogged.id);
 
       router.push("/");
     } catch (error) {
