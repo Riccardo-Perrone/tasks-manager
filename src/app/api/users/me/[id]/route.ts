@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = {
+  params: Promise<any>;
+};
+
+export async function GET(req: NextRequest, { params }: Params) {
   const { id } = await params;
   try {
     const result = await db.query("SELECT * FROM users WHERE id = $1", [id]);

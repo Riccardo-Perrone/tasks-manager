@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = {
+  params: Promise<any>;
+};
+
+export async function GET(req: NextRequest, { params }: Params) {
   const { id } = await params;
 
   try {
@@ -25,10 +26,9 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, { params }: Params) {
+  const { id } = await params;
+
   try {
     const { order_list } = await req.json();
 
@@ -45,7 +45,7 @@ export async function PUT(
        SET order_list = $1
        WHERE id = $2 
        RETURNING *`,
-      [order_list, params.id]
+      [order_list, id]
     );
 
     if (result.rows.length === 0) {

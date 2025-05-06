@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
+type Params = {
+  params: Promise<any>;
+};
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: Params) {
   const { id } = await params;
 
   try {

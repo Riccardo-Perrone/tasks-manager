@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = {
+  params: Promise<any>;
+};
+
+export async function GET(req: NextRequest, { params }: Params) {
   const { id } = await params;
 
   try {
@@ -34,13 +35,9 @@ export async function GET(
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = await params; // Accesso sincrono al parametro ID
+export async function PUT(req: NextRequest, { params }: Params) {
+  const { id } = await params;
 
-  // Assicurati che id non sia null
   if (!id) {
     return NextResponse.json({ error: "ID is required" }, { status: 400 });
   }
@@ -61,7 +58,7 @@ export async function PUT(
        SET title = $1, description = $2, time_estimated = $3, task_list_id = $4 
        WHERE id = $5 
        RETURNING *`,
-      [title, description, time_estimated, task_list_id, params.id]
+      [title, description, time_estimated, task_list_id, id]
     );
 
     if (result.rows.length === 0)
@@ -76,14 +73,13 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  _: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(_: NextRequest, { params }: Params) {
+  const { id } = await params;
+
   try {
     const result = await db.query(
       "DELETE FROM tasks WHERE id = $1 RETURNING *",
-      [params.id]
+      [id]
     );
     if (result.rows.length === 0)
       return NextResponse.json({ error: "Task not found" }, { status: 404 });

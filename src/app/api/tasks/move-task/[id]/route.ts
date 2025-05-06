@@ -1,12 +1,13 @@
-// src/app/api/tasks/move-task/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 
-// PUT /api/tasks/move-task/:id
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = {
+  params: Promise<any>;
+};
+
+export async function PUT(req: NextRequest, { params }: Params) {
+  const { id } = await params;
+
   try {
     const { task_list_id, order_task } = await req.json();
 
@@ -22,7 +23,7 @@ export async function PUT(
        SET task_list_id = $1, order_task = $2 
        WHERE id = $3 
        RETURNING *`,
-      [task_list_id, order_task, params.id]
+      [task_list_id, order_task, id]
     );
 
     if (result.rows.length === 0)
